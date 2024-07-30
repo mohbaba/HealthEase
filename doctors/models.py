@@ -10,6 +10,7 @@ from users.models import UserProfile
 # Create your models here.
 
 RATING = [
+    (0, 'ZERO_STAR'),
     (1, 'ONE_STAR'),
     (2, 'TWO_STAR'),
     (3, 'THREE_STAR'),
@@ -44,7 +45,7 @@ class Doctor(models.Model):
     registration_number = models.IntegerField()
     registration_council = models.CharField(max_length=50)
     registration_year = models.DateField(auto_now=False)
-    rating = models.IntegerField(choices=RATING)
+    rating = models.IntegerField(choices=RATING, default='ZERO_STAR')
     specialty = models.CharField(choices=SPECIALTY, max_length=100)
     consultation_fee = models.IntegerField()
     qualification = models.CharField(max_length=50)
