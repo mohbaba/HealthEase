@@ -18,7 +18,6 @@ ALLERGIES = [
     ('Fish', 'Fish')
 ]
 
-
 DISEASES = [
     ('Diabetes', 'Diabetes'),
     ('Hypertension', 'Hypertension'),
@@ -96,7 +95,7 @@ class Patient(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='patient')
     medical_records = models.ForeignKey(MedicalRecords, on_delete=CASCADE)
     newly_prescribed_medicine = models.ManyToManyField(Medicine)
-    doctors_notes = models.ManyToManyField(DoctorsNote,related_name='notes')
+    doctors_notes = models.ManyToManyField(DoctorsNote, related_name='notes')
 
     class Meta:
         verbose_name = 'Patient'
@@ -104,3 +103,6 @@ class Patient(models.Model):
 
     def __str__(self):
         return self.user_profile.get_full_name()
+
+
+
