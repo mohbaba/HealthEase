@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,3 +21,10 @@ class RegisterPharmacyView(APIView):
         return Response(registration, status=status.HTTP_201_CREATED)
 
 
+class UpdatePharmacyView(APIView):
+    def put(self, request, pk):
+        pharmacy = get_object_or_404(Pharmacy, pk=pk)
+        serializer = PharmacySerializer(pharmacy, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
