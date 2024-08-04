@@ -1,14 +1,9 @@
-from django.shortcuts import render, get_object_or_404
-
-# Create your views here.
-
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.shortcuts import get_object_or_404
 from .models import Lab
 from .serializers import LabSerializer
-from rest_framework import filters
 
 
 class LabListCreateView(generics.ListCreateAPIView):
@@ -21,7 +16,7 @@ class LabRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LabSerializer
 
 
-class LabListFilterByName(generics.ListCreateAPIView):
+class LabListFilterByName(generics.ListAPIView):
     serializer_class = LabSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
@@ -31,10 +26,10 @@ class LabListFilterByName(generics.ListCreateAPIView):
         name = self.request.query_params.get('name', None)
         if name:
             queryset = queryset.filter(name__icontains=name)
-            return Response(data=queryset, status=status.HTTP_200_OK)
+        return queryset
 
 
-class LabListFilterByLocation(generics.ListCreateAPIView):
+class LabListFilterByLocation(generics.ListAPIView):
     serializer_class = LabSerializer
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name']
@@ -46,11 +41,11 @@ class LabListFilterByLocation(generics.ListCreateAPIView):
         location = self.request.query_params.get('location', None)
         if location:
             queryset = queryset.filter(location__icontains=location)
-        return Response(data=queryset, status=status.HTTP_200_OK)
+        return queryset
 
 
 class DeleteLab(APIView):
     def delete(self, request, pk):
         lab = get_object_or_404(Lab, pk=pk)
         lab.delete()
-        return Response(data={'message': 'Lab deleted successfully!'}, status=status.HTTP_200_OK)
+        return Response(data={'message': 'Lab deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
