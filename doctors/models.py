@@ -37,7 +37,9 @@ SPECIALTY = [
     ('UROLOGY', 'Urology'),
 ]
 
-
+# 1. Remember to put image field for the picture of the license, certificates and other crucial credentials for registration
+# 2. Validate phone numbers, emails and license numbers
+# 3. Make all fields required
 class Doctor(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='doctor')
     license_number = models.IntegerField()
@@ -124,9 +126,10 @@ DRUGS = [
 ]
 
 
+
 class Medicine(models.Model):
     #We'll use these drugs pending the time we find an api for it
-    medicine_name = models.CharField(choices=DRUGS, max_length=50)
+    # medicine_name = models.CharField(choices=DRUGS, max_length=50)
     medication_form = models.CharField(choices=MEDICATION_FORM, max_length=50)
     dosage = models.IntegerField(default=0)
     no_times = models.IntegerField(default=1)
@@ -141,7 +144,7 @@ class Medicine(models.Model):
         verbose_name_plural = 'Drugs'
 
     def __str__(self):
-        return self.medicine_name
+        return self.drug_name
 
 
 class Prescription(models.Model):
@@ -151,12 +154,12 @@ class Prescription(models.Model):
     patient_age = models.IntegerField(default=0)
     patient_sex = models.CharField(choices=SEX, max_length=10)
     prescribed_date = models.DateTimeField(auto_now_add=True)
-    dosage = models.IntegerField()
+    # dosage = models.IntegerField()
     prescribed_drugs = models.ManyToManyField(Medicine, related_name='patients_prescribed_drugs')
-    no_times = models.IntegerField(default=1)
-    frequency = models.CharField(choices=FREQUENCY, max_length=50)
-    meal_instruction = models.CharField(choices=MEAL_INSTRUCTION, max_length=100)
-    start_date = models.DateField(auto_now_add=True)
+    # no_times = models.IntegerField(default=1)
+    # frequency = models.CharField(choices=FREQUENCY, max_length=50)
+    # meal_instruction = models.CharField(choices=MEAL_INSTRUCTION, max_length=100)
+    # start_date = models.DateField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Prescription'
