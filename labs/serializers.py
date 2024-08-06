@@ -18,3 +18,4 @@ class LabSerializer(serializers.ModelSerializer):
             'capacity',
             'date_established'
         ]
+        read_only_fields = ['id']
