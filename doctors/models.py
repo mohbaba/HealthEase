@@ -173,10 +173,10 @@ class DoctorsNote(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=DO_NOTHING)
     patient = models.ForeignKey('patients.Patient', on_delete=DO_NOTHING)
 
-    condition_description = models.TextField()
+    purpose = models.TextField()
     recommendations = models.TextField(blank=True, null=True)
-    note_status = models.CharField(max_length=20, choices=[('Issued', 'Issued'), ('Revoked', 'Revoked')],
-                                   default='Issued')
+    # note_status = models.CharField(max_length=20, choices=[('Issued', 'Issued'), ('Revoked', 'Revoked')],
+    #                                default='Issued')
     # verification_code = models.CharField(max_length=100, unique=True)
     date_of_issue = models.DateField(auto_now_add=True)
     doctor_signature = models.ImageField()
@@ -191,4 +191,4 @@ class DoctorsNote(models.Model):
         return Patient.objects.get(id=self.patient_id)
 
     def __str__(self):
-        return f"Doctor's Note for {self.get_patient().get_full_name()} by {self.doctor.user_profile.get_full_name()} on {self.date_of_issue}"
+        return f"Doctor's Note for {self.get_patient()} by {self.doctor.user_profile.get_full_name()} on {self.date_of_issue}"

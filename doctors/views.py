@@ -1,27 +1,32 @@
 import datetime
 
 from django.shortcuts import render, get_object_or_404
+from django.views.generic import CreateView
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView, \
+    ListCreateAPIView, UpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from doctors.models import Doctor, Medicine, Prescription
-from doctors.serializers import DoctorSerializer, MedicineSerializer, PrescriptionSerializer
+from doctors.models import Doctor, Medicine, Prescription, DoctorsNote
+from doctors.serializers import DoctorSerializer, MedicineSerializer, PrescriptionSerializer, DoctorsNoteSerializer, \
+    PrescriptionCreateSerializer
 from patients.models import Patient
 from users.models import UserProfile
 
 
 # Create your views here.
 
-class RegisterDoctorView(APIView):
-    def post(self, request):
-        serializer = DoctorSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            print(serializer.errors)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)
-        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+class DoctorCreate(ListCreateAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
+
+
+class DoctorRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
 
 
 class PrescribeMedicineView(APIView):
@@ -48,13 +53,13 @@ class PrescribeMedicineView(APIView):
             'doctor': doctor.id,
             'patient_firstname': patient.user_profile.first_name,
             'patient_lastname': patient.user_profile.last_name,
-            'patient_age': 30, #Remember to fix this when changed
-            'patient_sex': 'Male', #This too
+            'patient_age': 30,  #Remember to fix this when changed
+            'patient_sex': 'Male',  #This too
             'prescribed_date': datetime.datetime.now(),
             'prescribed_drugs': [drug.id for drug in drugs]
         }
 
-        prescription_serializer = PrescriptionSerializer(data=prescription_data)
+        prescription_serializer = PrescriptionCreateSerializer(data=prescription_data)
 
         if prescription_serializer.is_valid():
             prescription_serializer.save()
@@ -63,11 +68,46 @@ class PrescribeMedicineView(APIView):
             return Response(prescription_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MedicineView(APIView):
+class MedicineView(CreateAPIView):
+    queryset = Medicine.objects.all()
+    serializer_class = MedicineSerializer
 
-    def post(self, request):
-        serializer = MedicineSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
+class MedicineRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+    queryset = Medicine.objects.all()
+    serializer_class = MedicineSerializer
+
+
+class PrescriptionRetrieveDestroyView(RetrieveDestroyAPIView):
+    queryset = Prescription.objects.all()
+    serializer_class = PrescriptionSerializer
+
+    # permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        prescription = super().get_object()
+        doctor = Doctor.objects.filter(user_profile=self.request.user.id).first()
+
+        if doctor is None or prescription.doctor.id != doctor.id:
+            raise PermissionDenied(detail="You do not have permission to access this prescription.")
+
+        return prescription
+
+
+class DoctorsNoteCreate(CreateAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorsNoteSerializer
+
+
+class DoctorsNoteRetrieveUpdateDeleteView(RetrieveUpdateDestroyAPIView):
+    queryset = DoctorsNote.objects.all()
+    serializer_class = DoctorsNoteSerializer
+
+    def get_object(self):
+        doctor_note = super().get_object()
+        doctor = Doctor.objects.filter(user_profile=self.request.user.id).first()
+
+        if doctor is None or doctor_note.doctor.id != doctor.id:
+            raise PermissionDenied(detail="You do not have permission to access this doctor's note.")
+
+        return doctor_note

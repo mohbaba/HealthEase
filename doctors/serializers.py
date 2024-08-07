@@ -3,7 +3,7 @@ from time import timezone
 
 from rest_framework import serializers
 
-from doctors.models import Doctor, Prescription, Medicine
+from doctors.models import Doctor, Prescription, Medicine, DoctorsNote
 from users.serializers import UserProfileSerializer
 
 
@@ -59,7 +59,7 @@ class MedicineSerializer(serializers.ModelSerializer):
 
 
 class PrescriptionSerializer(serializers.ModelSerializer):
-    # prescribed_drugs = MedicineSerializer(many=True)
+    prescribed_drugs = MedicineSerializer(many=True)
 
     class Meta:
         model = Prescription
@@ -68,3 +68,21 @@ class PrescriptionSerializer(serializers.ModelSerializer):
             'prescribed_drugs'
         ]
         read_only_fields = ['id', 'prescribed_date']
+
+
+class PrescriptionCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prescription
+        fields = [
+            'id', 'doctor', 'patient_firstname', 'patient_lastname', 'patient_age', 'patient_sex',
+            'prescribed_date',
+            'prescribed_drugs'
+        ]
+        read_only_fields = ['id', 'prescribed_date']
+
+
+class DoctorsNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoctorsNote
+        fields = ['id', 'doctor', 'patient', 'date_of_issue', 'purpose', 'recommendations', 'doctor_signature']
+        read_only_fields = ['id', 'date_of_issue']
