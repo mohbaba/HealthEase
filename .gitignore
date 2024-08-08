@@ -1,13 +1,3 @@
 db.sqlite3
 .idea/
-patients/migrations
-doctors/migrations
-users/migrations
-user_message/migrations
-calls/migrations
-appointment/migrations
-labs/migrations
-notifications/migrations
-pharmacies/migrations
-vitals/migrations
-wallet/migrations
+
