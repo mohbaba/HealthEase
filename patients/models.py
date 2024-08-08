@@ -18,7 +18,6 @@ ALLERGIES = [
     ('Fish', 'Fish')
 ]
 
-
 DISEASES = [
     ('Diabetes', 'Diabetes'),
     ('Hypertension', 'Hypertension'),
@@ -71,6 +70,16 @@ FOOD_PREFERENCES = [
     ('Vegan', 'VEGAN')
 ]
 
+BLOOD_GROUP = {
+    'A+': 'A+',
+    'A-': 'A-',
+    'B+': 'B+',
+    'B-': 'B-',
+    'AB+': 'AB+',
+    'AB-': 'AB-',
+    'O+': 'O+'
+}
+
 
 class MedicalRecords(models.Model):
     allergies = models.CharField(choices=ALLERGIES, max_length=100)
@@ -96,7 +105,13 @@ class Patient(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='patient')
     medical_records = models.ForeignKey(MedicalRecords, on_delete=CASCADE)
     newly_prescribed_medicine = models.ManyToManyField(Medicine)
-    doctors_notes = models.ManyToManyField(DoctorsNote,related_name='notes')
+    doctors_notes = models.ManyToManyField(DoctorsNote, related_name='notes')
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')], default='Female')
+    blood_group = models.CharField(choices=BLOOD_GROUP, max_length=5, default='A+')
+    # TODO: might have to make emergency contact into a model
+    emergency_contact_name = models.CharField(max_length=40, default='null')
+    emergency_contact_phone = models.CharField(max_length=13, default='+23480000000')
 
     class Meta:
         verbose_name = 'Patient'
