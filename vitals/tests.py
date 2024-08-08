@@ -59,7 +59,8 @@ class VitalsTestCase(APITestCase):
 
         self.patient = Patient.objects.create(
             user_profile=self.user_profile,
-            medical_records=self.medical_records
+            medical_records=self.medical_records,
+            ge
         )
 
         self.doctors_note = DoctorsNote.objects.create(
