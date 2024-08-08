@@ -5,12 +5,12 @@ from users.models import UserProfile
 
 # Create your models here.
 
-NOTIFICATION_TYPES = [
+TYPES_NOTIFICATION = [
     ('Prescription', 'Prescription'),
     ('Appointment', 'Appointment'),
     ('Vitals', 'Vitals'),
     ('Message', 'Message'),
-    ('Reminder', 'Reminder'),
+    # ('Reminder', 'Reminder'),
 ]
 
 
@@ -19,7 +19,7 @@ class Notification(models.Model):
     is_sent = models.BooleanField(default=False)
 
     recipient = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='notifications')
-    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default=NOTIFICATION_TYPES)
+    notification_type = models.CharField(max_length=20, choices=TYPES_NOTIFICATION)
     created_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
     related_id = models.IntegerField(null=True,

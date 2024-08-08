@@ -1,9 +1,13 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test import Client
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
+from doctors.models import Medicine, DoctorsNote, Doctor
+from patients.models import Patient, MedicalRecords
 from users.models import UserProfile
 
 
@@ -12,52 +16,105 @@ from users.models import UserProfile
 class TestPatients(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        self.create_user_profile()
-        self.register_user_url = reverse('register-user')
-        self.register_user_response = self.client.post(self.register_user_url, self.user_profile_data)
-        self.user_profile = UserProfile.objects.create(**self.user_profile_data)
-        self.user_profile.save()
-        self.register_patient_url = reverse('register_patient')
-        self.create_medical_records()
-        self.create_patient_data()
-
-    def test_register_patient(self):
-        response = self.client.post(self.register_patient_url, self.patient_data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['user_profile'], self.register_user_response.data)
-        self.assertEqual(response.data['address'], self.patient_data['address'])
-        self.assertEqual(response.data['date_of_birth'], self.patient_data['date_of_birth'])
-
-    def create_patient_data(self):
-        self.patient_data = {
-            'user_profile': self.user_profile.id,
-            'medical_records': self.medical_records.id,
-            'date_of_birth': '2000, 1, 1',
-            'gender': 'Female',
-            'blood-group': 'A+',
-            'emergency_contact_name': 'shola',
-            'emergency_contact_contact': '+2348106317491'
-        }
-
-    def create_medical_records(self):
-        self.medical_records = {
-            'allergies': 'Lactose',
-            'current_medication': 'abidec',
-            'past_medication': 'ACCULOL',
-            'chronic_disease': 'Asthma',
-            'incident': 'Burns',
-            'surgeries': 'Lungs',
-            'smoking_habit': 'I dont smoke',
-            'alcohol_habit': 'Non-drinker',
-            'lifestyle': 'Moderately active',
-            'food_preference': 'Vegetarian'
-        }
-
-    def create_user_profile(self):
         self.user_profile_data = {
-            'username': 'patient1',
-            'password': 'password456',
-            'email': 'patient1@gmail.com',
-            'first_name': 'Jane',
+            'username': 'doctor1',
+            'password': 'password123',
+            "phone_number": "1234567890",
+            'email': 'doctor1@example.com',
+            'first_name': 'John',
             'last_name': 'Doe'
         }
+
+        self.register_user_url = reverse('register-user')
+        self.register_user_response = self.client.post(self.register_user_url, self.user_profile_data)
+
+        self.register_doctor_url = reverse('register_doctor')
+        with open(r"C:\Users\ENVY\Desktop\SEMICOLON\signature.jpg", 'rb') as f:
+            self.signature = f.read()
+        self.doctor_data = {
+            'user_profile': self.register_user_response.data['id'],
+            'license_number': 1234567890,
+            'signature': SimpleUploadedFile("signature.jpg", self.signature, content_type="image/jpg"),
+            'registration_number': 123456,
+            'registration_council': 'Medical Council',
+            'registration_year': '2020-01-01',
+            'rating': 5,
+            'specialty': 'CARDIOLOGY',
+            'consultation_fee': 500,
+            'qualification': 'MBBS',
+            'college': 'Medical College',
+            'start_year': '2010-01-01',
+            'end_year': '2015-01-01',
+            'is_available': True
+        }
+
+        self.doctor = self.client.post(self.register_doctor_url, self.doctor_data, format='multipart')
+
+        self.patient_user = UserProfile.objects.create_user(
+            username='patientuser',
+            email='patient@example.com',
+            password='password123',
+            phone_number='0987654321',
+            first_name='Jane',
+            last_name='Doe'
+        )
+
+        self.medical_records = MedicalRecords.objects.create(
+            allergies='Lactose',
+            current_medications='Abidec',
+            past_medications='Accord Bendroflumethiazide',
+            chronic_disease='Diabetes',
+            incident='Burns',
+            surgeries='Heart',
+            smoking_habit='NOT_SMOKER',
+            alcohol_habit='NON_DRINKER',
+            lifestyle='LOW',
+            food_preferences='VEGETARIAN'
+        )
+
+        self.medicine1 = Medicine.objects.create(
+            medication_form='Tablet',
+            dosage=500,
+            no_times=2,
+            frequency='Daily',
+            meal_instruction='With meal',
+            start_date=timezone.now().date(),
+            drug_name='Paracetamol',
+            drug_unit_of_weight='mg'
+        )
+
+        self.medicine2 = Medicine.objects.create(
+            medication_form='Capsule',
+            dosage=250,
+            no_times=3,
+            frequency='Weekly',
+            meal_instruction='After meal',
+            start_date=timezone.now().date(),
+            drug_name='Amoxicillin',
+            drug_unit_of_weight='mg'
+        )
+
+        # Create Patient
+        self.patient = Patient.objects.create(
+            user_profile=self.patient_user,
+            medical_records=self.medical_records
+        )
+
+        self.doctors_note = DoctorsNote.objects.create(
+            doctor=Doctor.objects.get(id=self.doctor.data['id']),
+            patient=self.patient,
+            purpose='Patient shows symptoms of a mild cold.',
+            recommendations='Rest and stay hydrated.',
+            doctor_signature=SimpleUploadedFile('signatureImage', self.signature, 'image/jpg')
+        )
+
+        self.patient.doctors_notes.add(self.doctors_note)
+        self.client.force_authenticate(user=UserProfile.objects.get(id=self.register_user_response.data.get('id')))
+
+    def test_register_patient(self):
+        url = reverse('patient')
+        data = {'user_profile': self.patient_user}
+        response = self.client.post(url, data, format='json')
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data.get('user_profile'), self.patient_user.id)
