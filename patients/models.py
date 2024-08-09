@@ -15,7 +15,9 @@ ALLERGIES = [
     ('Seafood', 'Seafood'),
     ('Nuts', 'Nuts'),
     ('Eggs', 'Eggs'),
-    ('Fish', 'Fish')
+    ('Fish', 'Fish'),
+    ('None', 'NONE'),
+    ('Other', 'OTHER'),
 ]
 
 DISEASES = [
@@ -24,7 +26,9 @@ DISEASES = [
     ('PCOS', 'PCOS'),
     ('Hypothyroidism', 'Hypothyroidism'),
     ('COPD', 'COPD'),
-    ('Asthma', 'Asthma')
+    ('Asthma', 'Asthma'),
+    ('None', 'NONE'),
+    ('Other', 'OTHER'),
 ]
 
 INCIDENT = [
@@ -32,6 +36,8 @@ INCIDENT = [
     ('Spinal Cord Injury', 'Spinal Cord Injury'),
     ('Spinal Fracture', 'Spinal Fracture'),
     ('Skull Fracture', 'Skull Fracture'),
+    ('None', 'NONE'),
+    ('Other', 'OTHER'),
 ]
 
 SURGERIES = [
@@ -40,6 +46,8 @@ SURGERIES = [
     ('Kidney', 'KIDNEY'),
     ('Lungs', 'LUNGS'),
     ('Brain', 'BRAIN'),
+    ('None', 'NONE')
+    ('Other', 'OTHER'),
 ]
 
 SMOKING_HABIT = [
