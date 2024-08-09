@@ -46,7 +46,7 @@ SURGERIES = [
     ('Kidney', 'KIDNEY'),
     ('Lungs', 'LUNGS'),
     ('Brain', 'BRAIN'),
-    ('None', 'NONE')
+    ('None', 'NONE'),
     ('Other', 'OTHER'),
 ]
 
