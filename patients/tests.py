@@ -112,9 +112,18 @@ class TestPatients(APITestCase):
         self.client.force_authenticate(user=UserProfile.objects.get(id=self.register_user_response.data.get('id')))
 
     def test_register_patient(self):
-        url = reverse('patient')
-        data = {'user_profile': self.patient_user}
+        new_patient_user = UserProfile.objects.create_user(
+            username='newpatient',
+            email='newpatient@example.com',
+            password='password123',
+            phone_number='0987654325',
+            first_name='Miles',
+            last_name='Morales'
+        )
+
+        url = reverse('patient-list')
+        data = {'user_profile': new_patient_user.id}
         response = self.client.post(url, data, format='json')
         print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data.get('user_profile'), self.patient_user.id)
+        self.assertEqual(response.data.get('user_profile'), new_patient_user.id)
