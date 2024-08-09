@@ -14,3 +14,8 @@ class WalletSerializer(serializers.ModelSerializer):
         model = Wallet
         fields = ['id', 'amount', 'date', 'status', 'user']
         read_only_fields = ['id', 'date']
+
+
+class DepositSerializer(serializers.ModelSerializer):
+    wallet_id = serializers.CharField(max_length=10)
+    amount = serializers.DecimalField(max_digits=15, decimal_places=2)

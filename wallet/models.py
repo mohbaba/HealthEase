@@ -32,7 +32,7 @@ class Transaction(models.Model):
 
 
 class Wallet(models.Model):
-    amount = models.FloatField(default=0)
+    amount = models.DecimalField(default=0)
     date = models.DateField(auto_now_add=True)
     status = models.BooleanField(default=False)
     user = models.ForeignKey(UserProfile, on_delete=CASCADE)
