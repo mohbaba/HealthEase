@@ -3,16 +3,16 @@ from decimal import Decimal
 
 import requests
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.views import APIView
 
 from health_ease import settings
 from .models import Wallet, Transaction
-from .serializers import WalletSerializer, DepositSerializer
-from .validators import validate_amount
+from .serializers import WalletSerializer, DepositSerializer, WithdrawSerializer, TransferSerializer
+from .validators import validate_amount, validate_balance
 
 
 class WalletViewSet(viewsets.ModelViewSet):
@@ -20,7 +20,8 @@ class WalletViewSet(viewsets.ModelViewSet):
     serializer_class = WalletSerializer
 
 
-class DepositViewSet(viewsets.ModelViewSet):
+class DepositView(APIView):
+    serializer_class = DepositSerializer
 
     def post(self, request):
         serializer = DepositSerializer(data=request.data)
@@ -28,7 +29,7 @@ class DepositViewSet(viewsets.ModelViewSet):
         wallet_id = serializer.validated_data['wallet_id']
         amount = Decimal(serializer.validated_data['amount'])
 
-        if amount <= 0:
+        if validate_amount(amount):
             return Response({'error': 'Deposit amount must be positive'}, status=status.HTTP_400_BAD_REQUEST)
 
         wallet = get_object_or_404(Wallet, pk=wallet_id)
@@ -41,7 +42,7 @@ class DepositViewSet(viewsets.ModelViewSet):
         data = {
             'email': wallet.user.email,
             'amount': int(amount * 100),
-            'callback_url': 'https://localhost:8000/wallet/paystack_callback',
+            'callback_url': 'http://127.0.0.1:8000/wallet/paystack_callback?reference=',
             'metadata': {
                 'wallet_id': wallet_id
             }
@@ -51,48 +52,17 @@ class DepositViewSet(viewsets.ModelViewSet):
         response_data = response.json()
 
         if response.status_code != 200 or not response_data.get('status'):
-            return Response({'error': 'Paystack transaction initialization failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': 'Paystack transaction initialization failed'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        payment_url = response_data['data']['authorization_url']
-        return Response({'payment_url': payment_url}, status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=['post'])
-    def withdraw(self, request, pk=None):
-        wallet = self.get_object()
-        amount = request.data.get('amount')
-        description = request.data.get('description', 'Withdrawal')
-
-        if not amount:
-            return Response({'error': 'Amount is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            amount = float(amount)
-            if amount <= 0:
-                raise ValueError("Withdrawal amount must be positive")
-
-            if wallet.amount < amount:
-                raise ValueError("Insufficient funds")
-
-            wallet.amount -= amount
-            wallet.save()
-
-            Transaction.objects.create(
-                user=wallet.user,
-                transaction_type='DEB',
-                amount=amount,
-                description=description
-            )
-            return Response({'status': 'Withdrawal successful'}, status=status.HTTP_200_OK)
-        except ValueError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        authorization_url = response_data['data']['authorization_url']
+        return redirect(authorization_url)
 
 
-class PaystackCallBackViewSet(viewsets.ModelViewSet):
+class PaystackCallbackView(APIView):
 
     @csrf_exempt
-    def paystack_callback(self, request):
+    def get(self, request):
         reference = request.GET.get('reference')
 
         if not reference:
@@ -103,33 +73,71 @@ class PaystackCallBackViewSet(viewsets.ModelViewSet):
             'Authorization': f'Bearer {settings.PAYSTACK_SECRET_KEY}',
         }
 
-        response = requests.get(paystack_url, headers=headers)
-        response_data = response.json()
+        try:
+            response = requests.get(paystack_url, headers=headers)
+            response.raise_for_status()
+            response_data = response.json()
+        except requests.RequestException as e:
+            return JsonResponse({'error': 'Payment verification request failed'}, status=500)
 
-        if response.status_code != 200 or not response_data.get('status'):
-            return JsonResponse({'error': 'Payment verification failed'}, status=400)
+        payment_data = response_data.get('data', {})
 
-        payment_data = response_data['data']
+        if not response_data.get('status') or payment_data.get('status') != 'success':
+            return JsonResponse({'error': 'Payment verification failed or payment was not successful'}, status=400)
 
-        if payment_data['status'] == 'success':
-            wallet = get_object_or_404(Wallet, pk=payment_data['metadata']['wallet_id'])
-            amount = Decimal(payment_data['amount']) / 100
-            wallet.amount += amount
-            wallet.save()
+        wallet_id = payment_data.get('metadata', {}).get('wallet_id')
+        wallet = get_object_or_404(Wallet, pk=wallet_id)
+        amount = Decimal(payment_data['amount']) / 100
+        wallet.amount += amount
+        wallet.save()
 
-            Transaction.objects.create(
-                user=wallet.user,
-                transaction_type='CRE',
-                amount=amount,
-                description="Deposit"
-            )
+        Transaction.objects.create(
+            user=wallet.user,
+            transaction_type='CRE',
+            transaction_status='S',
+            amount=amount,
+            description="Deposit"
+        )
 
-            transaction_details = {
-                'User': wallet.user.username,
-                'amount': amount,
-                'date': datetime.now(),
-                'transaction_type': "CREDIT"
-            }
-            return JsonResponse(transaction_details, status=200)
-        else:
-            return JsonResponse({'error': 'Payment was not successful'}, status=400)
+        return JsonResponse({
+            'User': wallet.user.username,
+            'amount': amount,
+            'date': datetime.now().isoformat(),
+            'transaction_type': "CREDIT"
+        }, status=200)
+
+
+class WithdrawView(APIView):
+
+    def post(self, request):
+        serializer = WithdrawSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        wallet_id = serializer.validated_data['wallet_id']
+        wallet = get_object_or_404(Wallet, pk=wallet_id)
+        amount = Decimal(serializer.validated_data['amount'])
+
+        if validate_amount(amount):
+            return Response({'detail': 'Withdrawal amount must be positive'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not validate_balance(wallet.amount, amount):
+            return Response({'detail': 'Insufficient balance'}, status=status.HTTP_400_BAD_REQUEST)
+
+        wallet.amount -= amount
+        wallet.save()
+
+        Transaction.objects.create(
+            user=wallet.user,
+            transaction_type='DEB',
+            amount=amount,
+            description='WITHDRAW'
+        )
+        return Response({'status': 'Withdraw successful'}, status=status.HTTP_200_OK)
+
+
+class TransferView(APIView):
+    def post(self, request):
+        serializer = TransferSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        sender = serializer.validated_data['sender']
+        receiver = serializer.validated_data['receiver']
+        amount = Decimal(serializer.validated_data['amount'])

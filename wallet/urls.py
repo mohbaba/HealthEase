@@ -1,8 +1,8 @@
 from django.urls import path
-
-from wallet import views
+from .views import DepositView, PaystackCallbackView, WithdrawView
 
 urlpatterns = [
-    path('deposit', views.DepositViewSet.as_view()),
-    path('paystack_callback', views.PaystackCallBackViewSet.as_view())
+    path('deposit/', DepositView.as_view()),
+    path('paystack_callback/', PaystackCallbackView.as_view()),
+    path('withdraw/', WithdrawView.as_view()),
 ]

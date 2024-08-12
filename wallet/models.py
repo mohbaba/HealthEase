@@ -23,7 +23,7 @@ class Transaction(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=DO_NOTHING)
     transaction_type = models.CharField(max_length=3, choices=TRANSACTION_TYPE, default='CRE')
     transaction_time = models.DateTimeField(auto_now_add=True)
-    amount = models.DecimalField(max_digits=6, decimal_places=2)
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
     description = models.TextField()
     transaction_status = models.CharField(max_length=1, choices=TRANSACTION_STATUS, default='S')
 
@@ -32,9 +32,8 @@ class Transaction(models.Model):
 
 
 class Wallet(models.Model):
-    amount = models.DecimalField(default=0)
+    amount = models.DecimalField(default=0, max_digits=15, decimal_places=2)
     date = models.DateField(auto_now_add=True)
-    status = models.BooleanField(default=False)
     user = models.ForeignKey(UserProfile, on_delete=CASCADE)
 
     # transactions = models.ForeignKey(Transaction, on_delete=CASCADE)
