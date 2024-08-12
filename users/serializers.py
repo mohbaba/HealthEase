@@ -1,4 +1,3 @@
-from rest_framework import serializers
 
 from users.models import UserProfile, Address
 from rest_framework import serializers
