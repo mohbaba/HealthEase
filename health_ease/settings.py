@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-8p8@h0*ls+iz3!(#2h#lqna1vib0si)e8a*fw5k^baczpr9xfw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://health-ease.fly.dev/']
 
 # Application definition
 
