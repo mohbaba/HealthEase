@@ -130,3 +130,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.UserProfile'
+
+PAYSTACK_SECRET_KEY = 'sk_test_f35ee2b6926acbf98227dae3967641c0c57183c8'
