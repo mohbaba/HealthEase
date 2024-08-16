@@ -24,6 +24,8 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('doctors/', include('doctors.urls')),
     path('vitals/', include('vitals.urls')),
+    path('patients/', include('patients.urls')),
+    path('appointments/', include('appointment.urls')),
     path('pharmacies/', include('pharmacies.urls')),
     path('wallet/', include('wallet.urls')),
     path('labs/', include('labs.urls')),

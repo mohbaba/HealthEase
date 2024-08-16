@@ -15,7 +15,9 @@ ALLERGIES = [
     ('Seafood', 'Seafood'),
     ('Nuts', 'Nuts'),
     ('Eggs', 'Eggs'),
-    ('Fish', 'Fish')
+    ('Fish', 'Fish'),
+    ('None', 'NONE'),
+    ('Other', 'OTHER'),
 ]
 
 DISEASES = [
@@ -24,7 +26,9 @@ DISEASES = [
     ('PCOS', 'PCOS'),
     ('Hypothyroidism', 'Hypothyroidism'),
     ('COPD', 'COPD'),
-    ('Asthma', 'Asthma')
+    ('Asthma', 'Asthma'),
+    ('None', 'NONE'),
+    ('Other', 'OTHER'),
 ]
 
 INCIDENT = [
@@ -32,6 +36,8 @@ INCIDENT = [
     ('Spinal Cord Injury', 'Spinal Cord Injury'),
     ('Spinal Fracture', 'Spinal Fracture'),
     ('Skull Fracture', 'Skull Fracture'),
+    ('None', 'NONE'),
+    ('Other', 'OTHER'),
 ]
 
 SURGERIES = [
@@ -40,6 +46,8 @@ SURGERIES = [
     ('Kidney', 'KIDNEY'),
     ('Lungs', 'LUNGS'),
     ('Brain', 'BRAIN'),
+    ('None', 'NONE'),
+    ('Other', 'OTHER'),
 ]
 
 SMOKING_HABIT = [
@@ -103,9 +111,9 @@ class MedicalRecords(models.Model):
 
 class Patient(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='patient')
-    medical_records = models.ForeignKey(MedicalRecords, on_delete=CASCADE)
-    newly_prescribed_medicine = models.ManyToManyField(Medicine)
-    doctors_notes = models.ManyToManyField(DoctorsNote, related_name='notes')
+    medical_records = models.ForeignKey(MedicalRecords, on_delete=CASCADE, null=True, blank=True)
+    newly_prescribed_medicine = models.ManyToManyField(Medicine, blank=True)
+    doctors_notes = models.ManyToManyField(DoctorsNote, related_name='notes', blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')], default='Female')
     blood_group = models.CharField(choices=BLOOD_GROUP, max_length=5, default='A+')

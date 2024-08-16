@@ -1,8 +1,18 @@
 from django.db import models
 
+from doctors.models import Doctor
+from patients.models import Patient
+
+
 # Create your models here.
 
 class Appointment(models.Model):
-    appointment_time = models.TimeField(auto_now=False, auto_now_add=False)
-    status = models.BooleanField(default=False)
-    appointment_date = models.DateField(auto_now_add=True)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, null=True)
+    appointment_date = models.DateTimeField()
+    reason = models.TextField(default=None)
+    status = models.CharField(max_length=20, choices=[('Scheduled', 'Scheduled'), ('Completed', 'Completed'),
+                                                      ('Cancelled', 'Cancelled')], default='Scheduled')
+
+    class Meta:
+        ordering = ['appointment_date']
