@@ -5,7 +5,7 @@ from django.views.generic import CreateView
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView, \
-    ListCreateAPIView, UpdateAPIView
+    ListCreateAPIView, UpdateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,6 +25,11 @@ class DoctorCreate(ListCreateAPIView):
 
 
 class DoctorRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
+
+
+class DoctorListView(ListAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
 

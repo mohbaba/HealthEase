@@ -8,6 +8,13 @@ django = "*"
 djangorestframework = "*"
 pillow = "*"
 gunicorn = "*"
+whitenoise = "*"
+dj-database-url = "*"
+python-dotenv = "*"
+psycopg2-binary = "*"
+requests = "*"
+djoser = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
