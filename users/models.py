@@ -4,16 +4,22 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CASCADE
 
-
 # from wallet.models import Wallet
 
 
 # Create your models here.
+ROLES = [
+    ('PATIENT', 'PATIENT'),
+    ('DOCTOR', 'DOCTOR'),
+    ('PHARMACIST', 'PHARMACIST'),
+    ('LABORATORY', 'LABORATORY'),
+]
 
 
 class UserProfile(AbstractUser):
     email = models.EmailField(max_length=254, unique=True)
     phone_number = models.CharField(max_length=11, unique=True)
+    role = models.CharField(max_length=15, choices=ROLES, default='PATIENT')
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['phone_number']
 
