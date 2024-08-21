@@ -37,6 +37,7 @@ SPECIALTY = [
     ('UROLOGY', 'Urology'),
 ]
 
+
 # 1. Remember to put image field for the picture of the license, certificates and other crucial credentials for registration
 # 2. Validate phone numbers, emails and license numbers
 # 3. Make all fields required
@@ -113,18 +114,6 @@ MEAL_INSTRUCTION = [
     ('Before sleep', 'BEFORE_SLEEP'),
 ]
 
-DRUGS = [
-    ('21st Century fish oil', '21st Century fish oil'),
-    ('Abidec', 'Abidec'),
-    ('Accord Bendroflumethiazide', 'Accord Bendroflumethiazide'),
-    ('ACCULOL', 'ACCULOL'),
-    ('Actavis Doxycycline', 'Actavis Doxycycline'),
-    ('Actinaza', 'Actinaza'),
-    ('Aday kit tablets', 'Aday kit tablets'),
-    ('Afrab vite', 'Afrab vite'),
-    ('Africolo 1000 Capsules', 'Africolo 1000 Capsules')
-]
-
 
 
 class Medicine(models.Model):
@@ -156,6 +145,7 @@ class Prescription(models.Model):
     prescribed_date = models.DateTimeField(auto_now_add=True)
     # dosage = models.IntegerField()
     prescribed_drugs = models.ManyToManyField(Medicine, related_name='patients_prescribed_drugs')
+
     # no_times = models.IntegerField(default=1)
     # frequency = models.CharField(choices=FREQUENCY, max_length=50)
     # meal_instruction = models.CharField(choices=MEAL_INSTRUCTION, max_length=100)
