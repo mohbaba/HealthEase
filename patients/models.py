@@ -3,10 +3,20 @@ from datetime import datetime
 from django.db import models
 from django.db.models import CASCADE
 
-from doctors.models import Medicine, DoctorsNote, DRUGS
 from users.models import UserProfile
 
 # Create your models here.
+DRUGS = [
+    ('21st Century fish oil', '21st Century fish oil'),
+    ('Abidec', 'Abidec'),
+    ('Accord Bendroflumethiazide', 'Accord Bendroflumethiazide'),
+    ('ACCULOL', 'ACCULOL'),
+    ('Actavis Doxycycline', 'Actavis Doxycycline'),
+    ('Actinaza', 'Actinaza'),
+    ('Aday kit tablets', 'Aday kit tablets'),
+    ('Afrab vite', 'Afrab vite'),
+    ('Africolo 1000 Capsules', 'Africolo 1000 Capsules')
+]
 
 
 ALLERGIES = [
@@ -78,15 +88,24 @@ FOOD_PREFERENCES = [
     ('Vegan', 'VEGAN')
 ]
 
-BLOOD_GROUP = {
-    'A+': 'A+',
-    'A-': 'A-',
-    'B+': 'B+',
-    'B-': 'B-',
-    'AB+': 'AB+',
-    'AB-': 'AB-',
-    'O+': 'O+'
-}
+BLOOD_GROUP = [
+    ('A+', 'A+'),
+    ('A-', 'A-'),
+    ('B+', 'B+'),
+    ('B-', 'B-'),
+    ('AB+', 'AB+'),
+    ('AB-', 'AB-'),
+    ('O+', 'O+'),
+    ('O-', 'O-')
+]
+
+GENOTYPE = [
+    ('AA', 'AA'),
+    ('AC', 'AC'),
+    ('SS', 'SS'),
+    ('SC', 'SC'),
+    ('AS', 'AS'),
+]
 
 
 class MedicalRecords(models.Model):
@@ -112,11 +131,11 @@ class MedicalRecords(models.Model):
 class Patient(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='patient')
     medical_records = models.ForeignKey(MedicalRecords, on_delete=CASCADE, null=True, blank=True)
-    newly_prescribed_medicine = models.ManyToManyField(Medicine, blank=True)
-    doctors_notes = models.ManyToManyField(DoctorsNote, related_name='notes', blank=True)
+    newly_prescribed_medicine = models.ManyToManyField('doctors.Medicine', blank=True, null=True)
+    doctors_notes = models.ManyToManyField('doctors.DoctorsNote', related_name='notes', blank=True, null=True)
     date_of_birth = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')], default='Female')
-    blood_group = models.CharField(choices=BLOOD_GROUP, max_length=5, default='A+')
+    blood_group = models.CharField(choices=BLOOD_GROUP, max_length=5, blank=True)
+    genotype = models.CharField(choices=GENOTYPE, max_length=10, blank=True)
     # TODO: might have to make emergency contact into a model
     emergency_contact_name = models.CharField(max_length=40, default='null')
     emergency_contact_phone = models.CharField(max_length=13, default='+23480000000')
