@@ -20,7 +20,7 @@ ROLES = [
 
 class UserProfile(AbstractUser):
     email = models.EmailField(max_length=254, unique=True)
-    phone_number = models.CharField(max_length=11, unique=True,validators = [
+    phone_number = models.CharField(max_length=11, unique=True, validators=[
         RegexValidator(
             regex=r'^\d{11}$',
             message=_("Phone number must be exactly 11 digits."),
@@ -31,7 +31,6 @@ class UserProfile(AbstractUser):
     role = models.CharField(max_length=15, choices=ROLES, default='PATIENT')
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['phone_number']
-
 
     def __str__(self):
         return self.email

@@ -1,20 +1,18 @@
-import datetime
+from datetime import date, datetime
 
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import CreateView
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView, \
     ListCreateAPIView, UpdateAPIView, ListAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 
 from doctors.models import Doctor, Medicine, Prescription, DoctorsNote
 from doctors.serializers import DoctorSerializer, MedicineSerializer, PrescriptionSerializer, DoctorsNoteSerializer, \
     PrescriptionCreateSerializer
 from patients.models import Patient
-from users.models import UserProfile
 
 
 # Create your views here.
@@ -22,6 +20,7 @@ from users.models import UserProfile
 class DoctorCreate(ListCreateAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
+    permission_classes = [AllowAny]
 
 
 class DoctorRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
@@ -58,9 +57,9 @@ class PrescribeMedicineView(APIView):
             'doctor': doctor.id,
             'patient_firstname': patient.user_profile.first_name,
             'patient_lastname': patient.user_profile.last_name,
-            'patient_age': 30,  #Remember to fix this when changed
-            'patient_sex': 'Male',  #This too
-            'prescribed_date': datetime.datetime.now(),
+            'patient_age': date.today().year - patient.date_of_birth.year,
+            'patient_sex': patient.user_profile.gender,
+            'prescribed_date': datetime.now(),
             'prescribed_drugs': [drug.id for drug in drugs]
         }
 
