@@ -12,6 +12,6 @@ class PatientService:
         patient = get_object_or_404(Patient, user_profile__id=user.id)
         appointments = Appointment.objects.filter(patient=patient)
         return {
-            'details': PatientSerializer(patient).data,
+            'patient_details': PatientSerializer(patient).data,
             'appointments': AppointmentSerializer(appointments, many=True).data
         }

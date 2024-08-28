@@ -1,3 +1,5 @@
+from datetime import time
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
@@ -53,21 +55,27 @@ class AppointmentTests(APITestCase):
         self.appointment_data = {
             'patient': self.patient.id,
             'doctor': self.doctor.id,
-            'appointment_date': '2024-08-10T10:00:00Z',
-            'reason': 'Routine check-up'
+            'appointment_date': '2024-08-10',
+            'reason': 'Routine check-up',
+            'start_time': '08',
+            'end_time': '10',
         }
 
         self.appointment = Appointment.objects.create(
             patient_id=self.patient.id,
             doctor_id=self.doctor.id,
-            appointment_date='2024-08-10T10:00:00Z',
-            reason='Complaints'
+            appointment_date='2024-08-10',  # YYYY-MM-DD format for DateField
+            reason='Routine Checkup',
+            start_time=time(10, 0),  # 10:00 AM
+            end_time=time(11, 0),  # 11:00 AM
+            status='Scheduled'
         )
         self.client.force_authenticate(user=self.patient_user)  # authenticate the client as the patient user
 
     def test_create_appointment(self):
         url = reverse('appointment-list')
         response = self.client.post(url, self.appointment_data, format='json')
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Appointment.objects.count(), 2)
         self.assertEqual(Appointment.objects.get(id=response.data.get('id')).reason, response.data.get('reason'))
@@ -100,3 +108,6 @@ class AppointmentTests(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Appointment.objects.count(), 0)
+
+    def test_create_appointment_when_doctor_is_booked(self):
+        pass
