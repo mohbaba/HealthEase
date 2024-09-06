@@ -20,7 +20,6 @@ from patients.models import Patient
 class DoctorCreate(ListCreateAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
-    permission_classes = [AllowAny]
 
 
 class DoctorRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
@@ -29,6 +28,7 @@ class DoctorRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
 
 
 class DoctorListView(ListAPIView):
+    permission_classes = [AllowAny]
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
 
