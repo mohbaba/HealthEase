@@ -52,7 +52,7 @@ RUN pipenv install --deploy --ignore-pipfile
 COPY . /app/
 
 # Collect static files for production
-RUN pipenv run python manage.py collectstatic --noinput
+RUN #pipenv run python manage.py collectstatic --noinput
 
 # Expose the port on which Django will run
 EXPOSE 8000
