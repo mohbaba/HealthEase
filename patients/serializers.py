@@ -11,6 +11,9 @@ class MedicalRecordsSerializer(serializers.ModelSerializer):
 
 
 class PatientSerializer(serializers.ModelSerializer):
+    medical_records = serializers.SerializerMethodField()
+    newly_prescribed_medicine = serializers.SerializerMethodField()
+    doctors_notes = serializers.SerializerMethodField()
     class Meta:
         model = Patient
         fields = '__all__'
@@ -20,17 +23,46 @@ class PatientSerializer(serializers.ModelSerializer):
             'newly_prescribed_medicine': {'required': False},
             'doctors_notes': {'required': False}
         }
+    def get_medical_records(self, obj):
+        if obj.medical_records is None:
+            return {"default_value": "No medical records available"}
+        return MedicalRecordsSerializer(obj.medical_records, many=True).data
 
-    medical_records = MedicalRecordsSerializer()
-    newly_prescribed_medicine = MedicineSerializer(many=True)
-    doctors_notes = DoctorsNoteSerializer(many=True)
+    def get_newly_prescribed_medicine(self, obj):
+        if obj.newly_prescribed_medicine is None:
+            return {"default_value": "No currently prescribed medicine provided yet"}
+        return MedicineSerializer(obj.newly_prescribed_medicine, many=True).data
+
+    def get_doctors_notes(self, obj):
+        if obj.doctors_notes is None:
+            return {"default_value": "No doctors notes provided yet"}
+        return DoctorsNoteSerializer(obj.doctors_notes, many=True).data
+
+    # medical_records = MedicalRecordsSerializer()
+    # newly_prescribed_medicine = MedicineSerializer(many=True)
+    # doctors_notes = DoctorsNoteSerializer(many=True)
 
 
 class PatientRecordsSerializer(serializers.ModelSerializer):
+    medical_records = serializers.SerializerMethodField()
+    newly_prescribed_medicine = serializers.SerializerMethodField()
+    doctors_notes = serializers.SerializerMethodField()
+
     class Meta:
-        Model = Patient
+        model = Patient  # lowercase 'model'
         fields = '__all__'
 
-    medical_records = MedicalRecordsSerializer()
-    newly_prescribed_medicine = MedicineSerializer()
-    doctors_notes = DoctorsNoteSerializer()
+    def get_medical_records(self, obj):
+        if obj.medical_records is None:
+            return {"default_value": "No medical records available"}
+        return MedicalRecordsSerializer(obj.medical_records, many=True).data
+
+    def get_prescribed_medicine(self, obj):
+        if obj.newly_prescribed_medicine is None:
+            return {"default_value": "No currently prescribed medicine provided yet"}
+        return MedicineSerializer(obj.newly_prescribed_medicine, many=True).data
+
+    def get_doctors_notes(self, obj):
+        if obj.doctors_notes is None:
+            return {"default_value": "No doctors notes provided yet"}
+        return DoctorsNoteSerializer(obj.doctors_notes, many=True).data

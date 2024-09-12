@@ -130,9 +130,9 @@ class MedicalRecords(models.Model):
 
 class Patient(models.Model):
     user_profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='patient')
-    medical_records = models.ForeignKey(MedicalRecords, on_delete=CASCADE, null=True, blank=True, default='null')
-    newly_prescribed_medicine = models.ManyToManyField('doctors.Medicine', blank=True, null=True, default='null')
-    doctors_notes = models.ManyToManyField('doctors.DoctorsNote', related_name='notes', blank=True, null=True, default='null')
+    medical_records = models.ForeignKey(MedicalRecords, on_delete=CASCADE, null=True, blank=True)
+    newly_prescribed_medicine = models.ManyToManyField('doctors.Medicine', blank=True, null=True)
+    doctors_notes = models.ManyToManyField('doctors.DoctorsNote', related_name='notes', blank=True, null=True)
     date_of_birth = models.DateField(null=True, blank=True, default='Not specified yet')
     blood_group = models.CharField(choices=BLOOD_GROUP, max_length=5, blank=True)
     genotype = models.CharField(choices=GENOTYPE, max_length=10, blank=True)
