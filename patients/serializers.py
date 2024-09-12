@@ -25,12 +25,12 @@ class PatientSerializer(serializers.ModelSerializer):
         }
     def get_medical_records(self, obj):
         if obj.medical_records is None:
-            return {"default_value": "No medical records available"}
+            return "No medical records available"
         return MedicalRecordsSerializer(obj.medical_records, many=True).data
 
     def get_newly_prescribed_medicine(self, obj):
         if obj.newly_prescribed_medicine is None:
-            return {"default_value": "No currently prescribed medicine provided yet"}
+            return "No currently prescribed medicine provided yet"
         return MedicineSerializer(obj.newly_prescribed_medicine, many=True).data
 
     def get_doctors_notes(self, obj):
@@ -40,8 +40,8 @@ class PatientSerializer(serializers.ModelSerializer):
 
     def get_date_of_birth(self, obj):
         if obj.date_of_birth is None:
-            return {"default_value": "Not specified yet"}
-        return obj.date_of_birth
+            return "Not specified yet"
+        return obj.date_of_birth.strftime('%Y-%m-%d')
 
 
 
