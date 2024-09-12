@@ -14,6 +14,7 @@ class PatientSerializer(serializers.ModelSerializer):
     medical_records = serializers.SerializerMethodField()
     newly_prescribed_medicine = serializers.SerializerMethodField()
     doctors_notes = serializers.SerializerMethodField()
+    date_of_birth = serializers.SerializerMethodField()
     class Meta:
         model = Patient
         fields = '__all__'
