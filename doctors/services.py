@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from appointment.models import Appointment
 from appointment.serializers import AppointmentSerializer
 from doctors.models import Doctor
+# from doctors.serializers import DoctorSerializer
 from notifications.models import Notification
 from notifications.serializers import NotificationSerializer
 
@@ -15,6 +16,7 @@ class DoctorService:
         notifications = Notification.objects.filter(recipient__doctor=doctor)
 
         return {
+            # 'doctor': DoctorSerializer(doctor).data,
             'appointments': AppointmentSerializer(appointments, many=True).data,
             'notifications': NotificationSerializer(notifications, many=True).data
         }

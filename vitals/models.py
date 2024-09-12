@@ -51,7 +51,11 @@ class Height(models.Model):
     last_recorded = models.DateTimeField(auto_now_add=True)
 
 
+
 class Vitals(models.Model):
+    # class VitalObjects(models.Manager):
+    #     def get_queryset(self):
+    #         return super().get_queryset().filter(patient=self.patient)
     patient = models.ForeignKey(Patient, on_delete=DO_NOTHING)
     weight = models.ForeignKey(Weight, on_delete=DO_NOTHING)
     height = models.ForeignKey(Height, on_delete=DO_NOTHING)

@@ -1,5 +1,4 @@
 import datetime
-from time import timezone
 
 from rest_framework import serializers
 
@@ -8,8 +7,8 @@ from users.serializers import UserProfileSerializer
 
 
 class DoctorSerializer(serializers.ModelSerializer):
+    user_profile = UserProfileSerializer(read_only=True)
     class Meta:
-        user_profile = UserProfileSerializer(read_only=True)
         model = Doctor
         fields = [
             'id',
@@ -19,24 +18,26 @@ class DoctorSerializer(serializers.ModelSerializer):
             'registration_number',
             'registration_council',
             'registration_year',
-            'rating',
             'specialty',
             'consultation_fee',
             'qualification',
             'college',
             'start_year',
             'end_year',
-            'is_available'
+            'is_available',
+            'rating'
         ]
         extra_kwargs = {
             'id': {'read_only': True},
-            'signature': {'required': True}
+            'signature': {'required': True},
+            'license_number': {'write_only': True},
+            'rating': {'read_only': True},
         }
 
-        def validate_registration_year(self, value):
-            if value > datetime.datetime.now():
-                raise serializers.ValidationError("Registration year cannot be in the future.")
-            return value
+    def validate_registration_year(self, value):
+        if value > datetime.datetime.now():
+            raise serializers.ValidationError("Registration year cannot be in the future.")
+        return value
 
 
 class MedicineSerializer(serializers.ModelSerializer):

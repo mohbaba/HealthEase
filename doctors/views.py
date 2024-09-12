@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView, \
-    ListCreateAPIView, UpdateAPIView, ListAPIView
+    ListCreateAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
@@ -18,6 +18,7 @@ from patients.models import Patient
 # Create your views here.
 
 class DoctorCreate(ListCreateAPIView):
+    permission_classes = [AllowAny]
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
 
@@ -27,10 +28,10 @@ class DoctorRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     serializer_class = DoctorSerializer
 
 
-class DoctorListView(ListAPIView):
-    permission_classes = [AllowAny]
-    queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
+# class DoctorListView(ListAPIView):
+#     permission_classes = [AllowAny]
+#     queryset = Doctor.objects.all()
+#     serializer_class = DoctorSerializer
 
 
 class PrescribeMedicineView(APIView):
