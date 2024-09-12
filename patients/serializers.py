@@ -38,9 +38,7 @@ class PatientSerializer(serializers.ModelSerializer):
             return {"default_value": "No doctors notes provided yet"}
         return DoctorsNoteSerializer(obj.doctors_notes, many=True).data
 
-    # medical_records = MedicalRecordsSerializer()
-    # newly_prescribed_medicine = MedicineSerializer(many=True)
-    # doctors_notes = DoctorsNoteSerializer(many=True)
+
 
 
 class PatientRecordsSerializer(serializers.ModelSerializer):
