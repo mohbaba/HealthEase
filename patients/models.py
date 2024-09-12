@@ -133,7 +133,7 @@ class Patient(models.Model):
     medical_records = models.ForeignKey(MedicalRecords, on_delete=CASCADE, null=True, blank=True)
     newly_prescribed_medicine = models.ManyToManyField('doctors.Medicine', blank=True, null=True)
     doctors_notes = models.ManyToManyField('doctors.DoctorsNote', related_name='notes', blank=True, null=True)
-    date_of_birth = models.DateField(null=True, blank=True, default='Not specified yet')
+    date_of_birth = models.DateField(null=True, blank=True)
     blood_group = models.CharField(choices=BLOOD_GROUP, max_length=5, blank=True)
     genotype = models.CharField(choices=GENOTYPE, max_length=10, blank=True)
     # TODO: might have to make emergency contact into a model

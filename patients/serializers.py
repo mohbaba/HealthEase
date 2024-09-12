@@ -38,6 +38,10 @@ class PatientSerializer(serializers.ModelSerializer):
             return {"default_value": "No doctors notes provided yet"}
         return DoctorsNoteSerializer(obj.doctors_notes, many=True).data
 
+    def get_date_of_birth(self, obj):
+        if obj.date_of_birth is None:
+            return {"default_value": "Not specified yet"}
+        return obj.date_of_birth
 
 
 
