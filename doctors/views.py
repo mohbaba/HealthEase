@@ -22,6 +22,31 @@ class DoctorCreate(ListCreateAPIView):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        specialty = self.request.query_params.get('specialty',None)
+        name = self.request.query_params.get('name', None)
+        rating = self.request.query_params.get('rating', None)
+        consultation_fee = self.request.query_params.get('fee', None)
+        is_available = self.request.query_params.get('available', None)
+
+        if specialty:
+            queryset = queryset.filter(specialty__icontains=specialty)
+
+        if name:
+            queryset = queryset.filter(user_profile__first_name__icontains=name) | queryset.filter(
+                user_profile__last_name__icontains=name)
+
+        if rating:
+            queryset = queryset.filter(rating=rating)
+
+        if consultation_fee:
+            queryset = queryset.filter(consultation_fee__lte=consultation_fee)
+
+        if is_available:
+            queryset = queryset.filter(is_available=is_available)
+
+        return queryset
 
 class DoctorRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     queryset = Doctor.objects.all()

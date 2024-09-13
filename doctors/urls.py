@@ -5,7 +5,7 @@ from doctors.views import DoctorCreate, PrescribeMedicineView, MedicineView, Med
 
 urlpatterns = [
     path('auth/registerDoctor/', DoctorCreate.as_view(), name='register_doctor'),
-    path('doctors', DoctorCreate.as_view(), name='doctor_list'),
+    path('doctors/', DoctorCreate.as_view(), name='doctor_list'),
     path('prescribeMedicine', PrescribeMedicineView.as_view(), name='prescribe'),
     path('addDrug', MedicineView.as_view(), name='add-drug'),
     path('doctors/<int:pk>', DoctorRetrieveUpdateDestroyView.as_view(), name='update-doctor'),
