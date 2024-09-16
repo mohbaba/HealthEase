@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -37,6 +38,7 @@ def doctor_is_available(doctor_id, appointment_date, start_time, end_time):
 
 class AppointmentViewSet(ModelViewSet):
     queryset = Appointment.objects.all()
+    permission_classes = [AllowAny]
     serializer_class = AppointmentSerializer
 
     def get_object(self):
