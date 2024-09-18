@@ -3,6 +3,7 @@ from djoser.serializers import TokenCreateSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from doctors.services import DoctorService
+from health_ease.firebase_service import create_firebase_user, generate_custom_token
 from patients.models import Patient
 from patients.services import PatientService
 from users.models import Address
@@ -30,6 +31,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         user = UserProfile(**validated_data)
         user.set_password(password)
         user.save()
+        create_firebase_user(user)
         if user.role == 'PATIENT':
             patient = Patient(user_profile=user)
             patient.save()
@@ -45,6 +47,7 @@ class UserCreateSerializer(TokenCreateSerializer):
         refresh_token = RefreshToken.for_user(user)
         data['refresh_token'] = str(refresh_token)
         data['user'] = UserProfileSerializer(user).data
+        data['firebase_token'] = generate_custom_token(str(user.id))
         data.pop('password')
         data.pop('email')
         if user.role == 'PATIENT':
