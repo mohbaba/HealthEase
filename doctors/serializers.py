@@ -35,7 +35,7 @@ class DoctorSerializer(serializers.ModelSerializer):
         }
 
     def validate_registration_year(self, value):
-        if value > datetime.datetime.year:
+        if value > datetime.datetime.year :
             raise serializers.ValidationError("Registration year cannot be in the future.")
         return value
 
