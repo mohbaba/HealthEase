@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import RetrieveAPIView, ListAPIView, get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -19,6 +20,18 @@ def has_access_to_appointment(appointment, user):
 
     return (is_patient and appointment.patient.user_profile_id == user.id) or (
             is_doctor and appointment.doctor.user_profile_id == user.id)
+
+
+def get_patient_appointments(user):
+    is_patient = Patient.objects.filter(user_profile_id=user.id).exists()
+    is_doctor = Doctor.objects.filter(user_profile_id=user.id).exists()
+
+    if is_patient:
+        return Appointment.objects.filter(patient__user_profile_id=user.id)
+    elif is_doctor:
+        return Appointment.objects.filter(doctor__user_profile_id=user.id)
+    else:
+        return Appointment.objects.none()
 
 
 def doctor_is_available(doctor_id, appointment_date, start_time, end_time):
@@ -49,6 +62,16 @@ class AppointmentViewSet(ModelViewSet):
         else:
             raise PermissionDenied("You do not have permission to view this appointment.")
 
+    def get_queryset(self):
+        user = self.request.user
+        appointments = get_patient_appointments(user)
+        if appointments.exists():
+            return appointments
+        else:
+            print(user)
+            raise PermissionDenied("You do not have permission to view this appointment.")
+
+
     def destroy(self, request, *args, **kwargs):
         pass
 
@@ -62,3 +85,17 @@ class AppointmentViewSet(ModelViewSet):
         if not doctor_is_available(doctor_id, appointment_date, start_time, end_time):
             return Response({"error": "The doctor is not available at this time"}, status=status.HTTP_400_BAD_REQUEST)
         return super().create(request, *args, **kwargs)
+
+
+class GetAppointment(ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = AppointmentSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        appointments = get_patient_appointments(user)
+        if appointments.exists():
+            return appointments
+        else:
+            print(user)
+            raise PermissionDenied("You do not have permission to view this appointment.")

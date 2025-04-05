@@ -3,7 +3,7 @@ from djoser.serializers import TokenCreateSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from doctors.services import DoctorService
-from health_ease.firebase_service import create_firebase_user, generate_custom_token
+from users.firebase_service import create_firebase_user, generate_custom_token
 from patients.models import Patient
 from patients.services import PatientService
 from users.models import Address

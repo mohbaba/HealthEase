@@ -10,6 +10,7 @@ class Appointment(models.Model):
     class AppointmentObjects(models.Manager):
 
         def get_queryset(self):
+
             return super().get_queryset().filter(status='Scheduled')
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True)

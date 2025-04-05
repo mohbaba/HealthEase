@@ -11,7 +11,7 @@ def create_firebase_user(user):
     try:
         # Create the user in Firebase
         user = auth.create_user(
-            uid=str(user.id),  # Optionally use your database's ID as the UID
+            uid=str(user.id),
             email=user.email,
             display_name=f"{user.first_name} {user.last_name}",
         )
@@ -30,3 +30,4 @@ def generate_custom_token(uid):
     except Exception as e:
         print(f"Error generating custom token: {e}")
         return None
+
